@@ -173,7 +173,8 @@ class CanvasConverter:
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <title>Canvas Visualization</title>
     <style>
         * {{
@@ -195,6 +196,9 @@ class CanvasConverter:
             overflow: hidden;
             cursor: grab;
             position: relative;
+            touch-action: none;
+            -webkit-user-select: none;
+            user-select: none;
         }}
 
         #viewport.grabbing {{
@@ -333,6 +337,51 @@ class CanvasConverter:
         #instructions div {{
             margin: 4px 0;
         }}
+
+        /* Mobile optimizations */
+        @media (max-width: 768px) {{
+            #controls {{
+                top: 10px;
+                right: 10px;
+                padding: 8px;
+                gap: 6px;
+            }}
+
+            .control-btn {{
+                padding: 10px 14px;
+                font-size: 13px;
+                min-height: 44px;
+            }}
+
+            #instructions {{
+                bottom: 10px;
+                left: 10px;
+                padding: 8px;
+                font-size: 11px;
+                max-width: calc(100vw - 20px);
+            }}
+
+            #zoom-level {{
+                font-size: 11px;
+            }}
+        }}
+
+        @media (max-width: 480px) {{
+            #instructions {{
+                font-size: 10px;
+                padding: 6px;
+            }}
+
+            #controls {{
+                padding: 6px;
+                gap: 4px;
+            }}
+
+            .control-btn {{
+                padding: 8px 12px;
+                font-size: 12px;
+            }}
+        }}
     </style>
 </head>
 <body>
@@ -345,8 +394,8 @@ class CanvasConverter:
 
     <div id="instructions">
         <div><strong>Controls:</strong></div>
-        <div>• Mouse wheel: Zoom in/out</div>
-        <div>• Click + drag: Pan around</div>
+        <div>• Mouse wheel / Pinch: Zoom in/out</div>
+        <div>• Click + drag / Touch + drag: Pan around</div>
         <div>• Buttons or +/-/0 keys: Zoom controls</div>
     </div>
 
@@ -579,6 +628,76 @@ class CanvasConverter:
                 resetView();
             }}
         }});
+
+        // Mobile touch support
+        let lastTouchDistance = 0;
+        let touchStartX = 0;
+        let touchStartY = 0;
+        let isTouching = false;
+
+        function getTouchDistance(touches) {{
+            const dx = touches[0].clientX - touches[1].clientX;
+            const dy = touches[0].clientY - touches[1].clientY;
+            return Math.sqrt(dx * dx + dy * dy);
+        }}
+
+        function getTouchCenter(touches) {{
+            return {{
+                x: (touches[0].clientX + touches[1].clientX) / 2,
+                y: (touches[0].clientY + touches[1].clientY) / 2
+            }};
+        }}
+
+        viewport.addEventListener('touchstart', (e) => {{
+            if (e.touches.length === 1) {{
+                // Single touch - panning
+                isTouching = true;
+                touchStartX = e.touches[0].clientX - translateX;
+                touchStartY = e.touches[0].clientY - translateY;
+                viewport.classList.add('grabbing');
+            }} else if (e.touches.length === 2) {{
+                // Two touches - pinch to zoom
+                e.preventDefault();
+                lastTouchDistance = getTouchDistance(e.touches);
+            }}
+        }}, {{ passive: false }});
+
+        viewport.addEventListener('touchmove', (e) => {{
+            if (e.touches.length === 1 && isTouching) {{
+                // Single touch - panning
+                e.preventDefault();
+                translateX = e.touches[0].clientX - touchStartX;
+                translateY = e.touches[0].clientY - touchStartY;
+                updateTransform();
+            }} else if (e.touches.length === 2) {{
+                // Two touches - pinch to zoom
+                e.preventDefault();
+                const newDistance = getTouchDistance(e.touches);
+                const center = getTouchCenter(e.touches);
+                const rect = viewport.getBoundingClientRect();
+                const centerX = center.x - rect.left;
+                const centerY = center.y - rect.top;
+
+                // Calculate zoom delta based on distance change
+                const distanceChange = newDistance - lastTouchDistance;
+                const zoomDelta = (distanceChange / 100) * ZOOM_STEP;
+
+                zoom(zoomDelta, centerX, centerY);
+                lastTouchDistance = newDistance;
+            }}
+        }}, {{ passive: false }});
+
+        viewport.addEventListener('touchend', (e) => {{
+            if (e.touches.length === 0) {{
+                isTouching = false;
+                viewport.classList.remove('grabbing');
+            }} else if (e.touches.length === 1) {{
+                // Reset for single touch after pinch
+                touchStartX = e.touches[0].clientX - translateX;
+                touchStartY = e.touches[0].clientY - translateY;
+                lastTouchDistance = 0;
+            }}
+        }}, {{ passive: false }});
 
         // Initialize view centered
         updateTransform();
