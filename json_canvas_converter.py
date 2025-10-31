@@ -567,8 +567,12 @@ class CanvasConverter:
 
         function resetView() {{
             scale = 1;
-            translateX = 0;
-            translateY = 0;
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const canvasWidth = {width};
+            const canvasHeight = {height};
+            translateX = (viewportWidth - canvasWidth) / 2;
+            translateY = (viewportHeight - canvasHeight) / 2;
             updateTransform();
         }}
 
@@ -700,7 +704,20 @@ class CanvasConverter:
         }}, {{ passive: false }});
 
         // Initialize view centered
-        updateTransform();
+        function centerCanvas() {{
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const canvasWidth = {width};
+            const canvasHeight = {height};
+
+            // Center the canvas in the viewport
+            translateX = (viewportWidth - canvasWidth) / 2;
+            translateY = (viewportHeight - canvasHeight) / 2;
+
+            updateTransform();
+        }}
+
+        centerCanvas();
     </script>
 </body>
 </html>"""
