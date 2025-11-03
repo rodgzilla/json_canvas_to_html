@@ -212,14 +212,11 @@ Contributions are welcome! Some ideas for improvements:
 - Advanced edge routing algorithms
 - Node search/filter functionality
 
-## License
-
-[Add your license information here]
-
 ## Acknowledgments
 
 - JSON Canvas format by [Obsidian](https://obsidian.md/)
 - Inspired by the need to share visual knowledge graphs beyond note-taking apps
+- Claude Code for the generation of the code for this project
 
 ---
 
