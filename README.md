@@ -23,12 +23,14 @@ A lightweight Python tool that converts [JSON Canvas](https://jsoncanvas.org/) f
 |------------------------|----------------------|
 | ![JSON Canvas in Obsidian](graph_in_obsidian.png) | ![Rendered Output](graph_in_browser.png) |
 
+This graph can be accessed [https://rodgzilla.github.io/json_canvas_to_html/](https://rodgzilla.github.io/json_canvas_to_html/).
+
 ## Installation
 
 No installation required! Just download the script:
 
 ```bash
-git clone https://github.com/yourusername/json_canvas_claude_code.git
+git clone https://github.com/rodgzilla/json_canvas_claude_code.git
 cd json_canvas_claude_code
 ```
 
