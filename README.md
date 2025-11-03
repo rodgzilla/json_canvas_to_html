@@ -21,7 +21,7 @@ A lightweight Python tool that converts [JSON Canvas](https://jsoncanvas.org/) f
 
 | Obsidian Canvas Editor | Generated HTML Output |
 |------------------------|----------------------|
-| ![JSON Canvas in Obsidian](json_canvas.png) | ![Rendered Output](canvas_render.png) |
+| ![JSON Canvas in Obsidian](graph_in_obsidian.png) | ![Rendered Output](graph_in_browser.png) |
 
 ## Installation
 
